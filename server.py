@@ -76,7 +76,7 @@ def handle_dialog(req, res):
         res['response']['buttons'] = get_suggests(user_id)
         return
 
-    if not req['session']['new'] and 'second' in req['session']:
+    if (not req['session']['new'] and 'second' in req['session']) and req['session']['second']:
         # Это новый пользователь.
         # Инициализируем сессию и поприветствуем его.
         # Запишем подсказки, которые мы ему покажем в первый раз
