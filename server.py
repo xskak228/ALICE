@@ -49,6 +49,7 @@ def handle_dialog(res, req):
         # создаем словарь в который в будущем положим имя пользователя
         sessionStorage[user_id] = {
             'first_name': None
+            'start_game': None
         }
         return
 
