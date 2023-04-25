@@ -69,7 +69,7 @@ def handle_dialog(res, req):
             res['response'][
                 'text'] = 'Приятно познакомиться, ' \
                           + first_name.title() \
-                          + '. Я - Алиса. Какой город хочешь увидеть?'
+                          + '. Я Алиса. Отгадаешь город по фото?'
             # получаем варианты buttons из ключей нашего словаря cities
             res['response']['buttons'] = [
                 {
@@ -77,25 +77,33 @@ def handle_dialog(res, req):
                     'hide': True
                 } for city in cities
             ]
-    # если мы знакомы с пользователем и он нам что-то написал,
-    # то это говорит о том, что он уже говорит о городе,
-    # что хочет увидеть.
-    else:
-        # ищем город в сообщение от пользователя
-        city = get_city(req)
-        # если этот город среди известных нам,
-        # то показываем его (выбираем одну из двух картинок случайно)
-        if city in cities:
-            res['response']['card'] = {}
-            res['response']['card']['type'] = 'BigImage'
-            res['response']['card']['title'] = 'Этот город я знаю.'
-            res['response']['card']['image_id'] = random.choice(cities[city])
-            res['response']['text'] = 'Я угадал!'
-        # если не нашел, то отвечает пользователю
-        # 'Первый раз слышу об этом городе.'
+    if sessionStorage[user_id]['first_name'] is not None:
+        if (req["request"]["command"]).lower == "да" or "нет":
+            if (req["request"]["command"]).lower == "нет":
+                req["response"]["end_session"] = True
         else:
             res['response']['text'] = \
-                'Первый раз слышу об этом городе. Попробуй еще разок!'
+                'Не поняла. Ответ да или нет?'
+
+    # # если мы знакомы с пользователем и он нам что-то написал,
+    # # то это говорит о том, что он уже говорит о городе,
+    # # что хочет увидеть.
+    # else:
+    #     # ищем город в сообщение от пользователя
+    #     city = get_city(req)
+    #     # если этот город среди известных нам,
+    #     # то показываем его (выбираем одну из двух картинок случайно)
+    #     if city in cities:
+    #         res['response']['card'] = {}
+    #         res['response']['card']['type'] = 'BigImage'
+    #         res['response']['card']['title'] = 'Этот город я знаю.'
+    #         res['response']['card']['image_id'] = random.choice(cities[city])
+    #         res['response']['text'] = 'Я угадал!'
+    #     # если не нашел, то отвечает пользователю
+    #     # 'Первый раз слышу об этом городе.'
+    #     else:
+    #         res['response']['text'] = \
+    #             'Первый раз слышу об этом городе. Попробуй еще разок!'
 
 
 def get_city(req):
