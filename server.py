@@ -81,6 +81,7 @@ def handle_dialog(res, req):
         if (req["request"]["command"]).lower == "да" or "нет":
             if (req["request"]["command"]).lower == "нет":
                 req["response"]["end_session"] = True
+                req["response"]["text"] = "Конец"
         else:
             res['response']['text'] = \
                 'Не поняла. Ответ да или нет?'
