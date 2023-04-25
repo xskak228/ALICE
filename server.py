@@ -71,12 +71,14 @@ def handle_dialog(res, req):
                           + first_name.title() \
                           + '. Я Алиса. Отгадаешь город по фото?'
 
-    if sessionStorage[user_id]['first_name'] is not None:
-        if (req["request"]["command"]).lower == "да" or "нет":
-            if (req["request"]["command"]).lower == "нет":
-                req["response"]["text"] = "Конец"
-                req["response"]["end_session"] = True
-
+    if sessionStorage[user_id]["start_game"] is None:
+        y_n = get_yes(req)
+        if y_n == "да":
+            sessionStorage[user_id]["start_game"] = True
+            req["response"]["text"] = "Ок"
+        elif y_n == "нет":
+            req["response"]["text"] = "Конец"
+            req["response"]["end_session"] = True
         else:
             res['response']['text'] = \
                 'Не поняла. Ответ да или нет?'
@@ -101,6 +103,14 @@ def handle_dialog(res, req):
     #         res['response']['text'] = \
     #             'Первый раз слышу об этом городе. Попробуй еще разок!'
 
+def get_yes(req):
+    text = (req['request']["comand"]).lower()
+    if text == "да":
+        return "да"
+    elif text == "нет":
+        return "нет"
+    else:
+        return False
 
 def get_city(req):
     # перебираем именованные сущности
