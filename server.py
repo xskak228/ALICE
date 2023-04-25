@@ -70,18 +70,13 @@ def handle_dialog(res, req):
                 'text'] = 'Приятно познакомиться, ' \
                           + first_name.title() \
                           + '. Я Алиса. Отгадаешь город по фото?'
-            # получаем варианты buttons из ключей нашего словаря cities
-            res['response']['buttons'] = [
-                {
-                    'title': city.title(),
-                    'hide': True
-                } for city in cities
-            ]
+
     if sessionStorage[user_id]['first_name'] is not None:
         if (req["request"]["command"]).lower == "да" or "нет":
             if (req["request"]["command"]).lower == "нет":
-                req["response"]["end_session"] = True
                 req["response"]["text"] = "Конец"
+                req["response"]["end_session"] = True
+
         else:
             res['response']['text'] = \
                 'Не поняла. Ответ да или нет?'
