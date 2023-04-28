@@ -39,7 +39,7 @@ def main():
     logging.info(f'Response: {response!r}')
     return jsonify(response)
 
-
+a = None
 def handle_dialog(res, req):
     user_id = req['session']['user_id']
 
@@ -48,8 +48,9 @@ def handle_dialog(res, req):
         res['response']['text'] = 'Привет! Назови свое имя!'
         # создаем словарь в который в будущем положим имя пользователя
         sessionStorage[user_id] = {
-            'first_name': None
-            'start_game': None
+            'first_name': None,
+            'start_game': None,
+            'images': []
         }
         return
 
@@ -72,17 +73,27 @@ def handle_dialog(res, req):
                           + first_name.title() \
                           + '. Я Алиса. Отгадаешь город по фото?'
 
-    if sessionStorage[user_id]["start_game"] is None:
+
+    elif sessionStorage[user_id]['first_name'] is not None and sessionStorage[user_id]["start_game"] is None:
         y_n = get_yes(req)
         if y_n == "да":
             sessionStorage[user_id]["start_game"] = True
-            req["response"]["text"] = "Ок"
+            res['response']['text'] = "Поехали"
+            ran_photo(res, user_id)
         elif y_n == "нет":
-            req["response"]["text"] = "Конец"
-            req["response"]["end_session"] = True
+            res["response"]["end_session"] = True
         else:
             res['response']['text'] = \
                 'Не поняла. Ответ да или нет?'
+
+    elif sessionStorage[user_id]['first_name'] is not None and sessionStorage[user_id]["start_game"] is True:
+        res['response']['text'] = \
+            'Молодец, сыграем еще раз?'
+        city = ran_photo(res, user_id)
+        text = (req['request']["command"]).lower()
+        if text == city:
+            res['response']['text'] = \
+                'Молодец, сыграем еще раз?'
 
     # # если мы знакомы с пользователем и он нам что-то написал,
     # # то это говорит о том, что он уже говорит о городе,
@@ -104,14 +115,29 @@ def handle_dialog(res, req):
     #         res['response']['text'] = \
     #             'Первый раз слышу об этом городе. Попробуй еще разок!'
 
+def ran_photo(res, user_id):
+    while True:
+        city = random.choice(list(cities))
+        image = random.choice(cities[city])
+        if image not in sessionStorage[user_id]['images']:
+            sessionStorage[user_id]['images'].append(image)
+            res['response']['card'] = {}
+            res['response']['card']['type'] = 'BigImage'
+            res['response']['card']['title'] = 'Что за город на фото?'
+            res['response']['card']['image_id'] = image
+            return city
+
+
+
 def get_yes(req):
-    text = (req['request']["comand"]).lower()
+    text = (req['request']["command"]).lower()
     if text == "да":
         return "да"
     elif text == "нет":
         return "нет"
     else:
         return False
+
 
 def get_city(req):
     # перебираем именованные сущности
